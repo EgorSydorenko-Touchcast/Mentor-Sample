@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- Add Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Add Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Set Viewport -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <!-- Set Title -->
+    <title>Mentor Integration Sample</title>
+  </head>
+  <body>
+    <!-- Centered Glassmorphic Card (Input Section & Remote Video) -->
+    <div id="inputCard" class="d-flex justify-content-center align-items-center vh-100">
+      <div
+        id="cardContent"
+        class="card p-4 position-relative"
+      >
+        <!-- Input Section -->
+        <div id="cardInputs" class="p-3">
+          <div class="mb-4 text-center">
+            <h1 class="fw-bold">Mentor Integration Sample</h1>
+          </div>
+          <!-- Mentor ID Input -->
+          <div class="mb-4">
+            <label for="mentorIdInput" class="form-label">Mentor ID</label>
+            <input
+              type="text"
+              class="form-control form-control-lg"
+              id="mentorIdInput"
+              placeholder="Enter Mentor ID"
+            />
+          </div>
+          <!-- API Key Input -->
+          <div class="mb-4">
+            <label for="apiKeyInput" class="form-label">API Key</label>
+            <input
+              type="text"
+              class="form-control form-control-lg"
+              id="apiKeyInput"
+              placeholder="Enter API Key"
+            />
+          </div>
+          <!-- Start Session Button -->
+          <div class="mb-3 text-center">
+            <button id="startSession" class="btn btn-success btn-lg px-5 py-2">Start Session</button>
+          </div>
+        </div>
+
+        <!-- Loader -->
+        <div
+          id="loader"
+          class="position-absolute top-50 start-50 translate-middle d-none"
+        >
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+
+        <!-- Remote Video Section (hidden initially) -->
+        <div id="videoContainer" class="d-none position-absolute top-0 start-0 w-100 h-100">
+          <video
+            id="remoteVideo"
+            autoplay
+            playsinline
+          ></video>
+          <audio id="remoteAudio" autoplay playsinline hidden></audio>
+          <!-- Floating Controls for Mute and End Session -->
+          <div
+            id="remoteControls"
+            class="position-absolute bottom-0 start-50 translate-middle-x mb-4"
+          >
+            <div class="btn-group" role="group" aria-label="WebRTC Controls">
+              <button id="toggleMute" class="btn btn-light btn-lg">Mute</button>
+              <button id="stopMentor" class="btn btn-warning btn-lg">Stop</button>
+              <button id="endSession" class="btn btn-danger btn-lg">End Session</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add JS -->
+    <script src="scripts.js"></script>
+  </body>
+</html>
