@@ -24,6 +24,8 @@ async function doNegotiation({ mentorId, offer, apiKey }) {
       offer,
       use_green_video: false,
       use_idle_timeout: false,
+      prompt:`PROMPT`,
+      initial_instructions : "INITIAL INSTRUCTION {For example :Greeting the client}"
     }),
   });
 
