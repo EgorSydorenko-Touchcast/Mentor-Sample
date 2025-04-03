@@ -49,6 +49,25 @@
               placeholder="Enter API Key"
             />
           </div>
+          <!-- Mode -->
+          <div class="mb-4">
+            <label for="mode" class="form-label">Mode</label>
+            <select class="form-select" id="mode"  onselect="onModeSelected">
+              <option value="rt" selected>Real Time</option>
+              <option value="tts">Text To Speech</option>
+            </select>
+          </div>
+          <!-- Voice -->
+          <div class="mb-4">
+            <select class="form-select" id="voice" style="display: none;">
+              <option value="alloy" selected>alloy</option>
+              <option value="echo">echo</option>
+              <option value="fable">fable</option>
+              <option value="onyx">onyx</option>
+              <option value="nova">nova</option>
+              <option value="shimmer">shimmer</option>
+            </select>
+          </div>
           <!-- Start Session Button -->
           <div class="mb-3 text-center">
             <button id="startSession" class="btn btn-success btn-lg px-5 py-2">Start Session</button>
@@ -82,6 +101,10 @@
               <button id="toggleMute" class="btn btn-light btn-lg">Mute</button>
               <button id="stopMentor" class="btn btn-warning btn-lg">Stop</button>
               <button id="endSession" class="btn btn-danger btn-lg">End Session</button>
+            </div>
+            <div id="textInputGroup" class="pt-1">
+              <textarea class="form-control" rows="3" id="inputText"></textarea>
+              <button id="sendTextButton" class="btn btn-success w-100">Send text</button>
             </div>
           </div>
         </div>

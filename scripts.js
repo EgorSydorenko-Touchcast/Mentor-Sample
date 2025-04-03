@@ -7,9 +7,23 @@ const mentorIdInput = document.getElementById("mentorIdInput");
 const apiKeyInput = document.getElementById("apiKeyInput");
 const endSessionBtn = document.getElementById("endSession");
 const stopMentorBtn = document.getElementById("stopMentor");
+const modeSelect = document.getElementById("mode")
+const voiceSelect = document.getElementById("voice")
+const sendTextButton = document.getElementById("sendTextButton")
+const textArea = document.getElementById("inputText")
+
+
+function generateGUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0,
+      v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
 
 // --- doNegotiation Method ---
-async function doNegotiation({ mentorId, offer, apiKey }) {
+async function doNegotiation({ mentorId, offer, apiKey, mode }) {
   const apiUrl = "https://cogcache-proxy-api.touchcastmaas.dev/v1/realtime";
 
   const response = await fetch(apiUrl, {
@@ -22,10 +36,16 @@ async function doNegotiation({ mentorId, offer, apiKey }) {
       server_type: "hd",
       mentor_id: mentorId,
       offer,
+      mode:mode,
       use_green_video: false,
       use_idle_timeout: false,
       prompt:`PROMPT`,
       initial_instructions : "INITIAL INSTRUCTION {For example :Greeting the client}"
+    }, (key, value) => {
+      if (value === null) {
+        return undefined;
+      }
+      return value;
     }),
   });
 
@@ -143,7 +163,7 @@ function WebRTCManager() {
     }
   };
 
-  const negotiate = async (mentorId, userMicrophoneStream, apiKey) => {
+  const negotiate = async (mentorId, userMicrophoneStream, apiKey, mode) => {
     // Add an audio transceiver for send/receive.
     audioSender = peerConnection.addTransceiver("audio", {
       direction: "sendrecv",
@@ -203,6 +223,7 @@ function WebRTCManager() {
         mentorId,
         offer: offerLocal,
         apiKey,
+        mode
       });
       if (peerConnection.signalingState === "have-local-offer") {
         await peerConnection.setRemoteDescription(answerContent.answer);
@@ -222,7 +243,8 @@ function WebRTCManager() {
     mentorId,
     userMicrophoneStream,
     selectedMicrophone,
-    apiKey
+    apiKey,
+    mode
   ) => {
     isLoading = true;
     try {
@@ -234,7 +256,7 @@ function WebRTCManager() {
       peerConnection.addEventListener("track", handleTrack);
 
       dataChannel = peerConnection.createDataChannel("chat", { ordered: true });
-      await negotiate(mentorId, userMicrophoneStream, apiKey);
+      await negotiate(mentorId, userMicrophoneStream, apiKey, mode);
     } catch (e) {
       error = e;
       console.error("Error in WebRTC connection:", e);
@@ -298,7 +320,38 @@ toggleButton.addEventListener("click", () => {
   toggleButton.innerText = currentlyMuted ? "Unmute" : "Mute";
   console.log("Microphone muted:", currentlyMuted);
 });
-
+sendTextButton.addEventListener("click", ()=>{
+  dataChannel = webRTCManager.getDataChannel()
+  if (dataChannel) {
+    mode = modeSelect.value;
+    textToSend = textArea.value;
+    if(textToSend) {
+    let data = null;
+      if (mode == "tts") {
+        data = {
+          type: "talk",
+          data: {
+              talkId: generateGUID(),
+              text: textToSend,
+          }
+        };
+      } else {
+        data = {
+          type: "send_message",
+          data: {
+              role: "user",
+              text: textToSend,
+              trigger_response: true
+          }
+        };
+      
+        if(data) {
+          dataChannel.send(JSON.stringify(data));
+        }
+      }
+    }
+  }
+})
 stopMentorBtn.addEventListener("click", () => {
   const sessionId = webRTCManager.getSessionId();
   const dataChannel = webRTCManager.getDataChannel()
@@ -311,10 +364,15 @@ stopMentorBtn.addEventListener("click", () => {
   dataChannel?.send?.(JSON.stringify(data));
   console.log("stop mentor", data);
 });
-
+// modeSelect.addEventListener('change', () => {
+//   const isVisible = modeSelect.value == 'tts';
+//   voiceSelect.style.display = isVisible ? "block":"none";
+// });
 startButton.addEventListener("click", async () => {
   const mentorId = mentorIdInput.value.trim();
   const apiKey = apiKeyInput.value.trim();
+  const mode = modeSelect.value
+
   if (!mentorId || !apiKey) {
     alert("Mentor ID and API Key are required.");
     return;
@@ -339,7 +397,8 @@ startButton.addEventListener("click", async () => {
     mentorId,
     micStream,
     microphoneManager.getSelectedMicrophone(),
-    apiKey
+    apiKey,
+    mode
   );
   console.log("Session ID:", webRTCManager.getSessionId());
 });
